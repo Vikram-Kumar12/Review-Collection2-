@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+
+@font-face {
+    /* pass */
+    font-family: 'font1';
+    src: url('../public/assets/fonts/font1.woff') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    /* pass */
+    font-family: 'font2';
+    src: url('../public/assets/fonts/font2.otf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    /* Pass */
+    font-family: 'font3';
+    src: url('../public/assets/fonts/font3.woff2') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@keyframes rotateBackground {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.card-hover-bg::before {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background: conic-gradient(at center, #ff8000, #EA580C, #F5A100, #ff8000);
+  border-radius: 9999px;
+  filter: blur(64px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+.card-hover-bg:hover::before {
+  opacity: 0.2;
+  animation: rotateBackground 6s linear infinite;
+}
+
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+.animate-fadeInUp {
+  animation: fadeInUp 0.7s ease-out forwards;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+.animate-gradient-text {
+  background: linear-gradient(90deg, #FF7D0C, #EA580C, #FE9332, #FF7D0C);
+  background-size: 300% 300%;
+  animation: gradientMove 6s linear infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  user-select: none;
+  pointer-events: none;
+}

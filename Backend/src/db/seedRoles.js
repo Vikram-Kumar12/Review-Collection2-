@@ -1,0 +1,36 @@
+import Role from "../models/role.models.js";
+
+const cohortEmails = [
+  "student1@example.com",
+  "student2@example.com",
+  "vikram8987k@gmail.com",
+  // rest student email....
+];
+const adminEmails = [
+  "vikramkumar0120@gmail.com",
+  // rest admin email....
+];
+
+const seedRoles = async () => {
+  try {
+    const allEmails = [
+      ...cohortEmails.map((email) => ({ email, role: "Cohort" })),
+      ...adminEmails.map((email) => ({ email, role: "Admin" })),
+    ];
+
+    // console.log("allEmails :", allEmails);
+
+    for (const item of allEmails) {
+      const exists = await Role.findOne({ email: item.email });
+      // console.log("exists :", exists);
+      if (!exists) {
+        // console.log("run");
+        await Role.create(item);
+      }
+    }
+    // console.log("✅ Roles seeded successfully.");
+  } catch (error) {
+    console.error("❌ Error seeding roles:", error);
+  }
+};
+export default seedRoles;
