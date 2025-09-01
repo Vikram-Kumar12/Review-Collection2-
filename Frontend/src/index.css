@@ -84,3 +84,7 @@
   user-select: none;
   pointer-events: none;
 }
+
+/* body{
+  user-select:none
+} */

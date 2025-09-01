@@ -5,12 +5,12 @@ import { RiCloseLargeLine } from "react-icons/ri";
 import { CiSquarePlus } from "react-icons/ci";
 import { MdOutlineDashboardCustomize } from "react-icons/md";
 import { FiUser } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -28,13 +28,26 @@ const Navbar = () => {
   };
 
   const menuItems = [
-    { id: 1, name: "Post Review", icon: <CiSquarePlus /> },
-    { id: 2, name: "Dashboard", icon: <MdOutlineDashboardCustomize /> },
-    { id: 3, name: "Profile", icon: <FiUser /> },
+    {
+      id: 1,
+      name: "Post Review",
+      icon: <CiSquarePlus />,
+      link: "/post-review",
+    },
+    {
+      id: 2,
+      name: "Dashboard",
+      icon: <MdOutlineDashboardCustomize />,
+      link: "/dashboard",
+    },
+    { id: 3, name: "Profile", icon: <FiUser />, link: "/profile" },
   ];
 
+  const navi = () => {
+    navigate("/");
+  };
   return (
-    <nav className="text-white shadow-lg fixed top-0 px-1 md:px-5 lg:px-0 left-0 right-0 z-50 bg-black">
+    <nav className="text-white shadow-lg fixed top-0 px-1 md:px-5 lg:px-0 left-0 right-0 z-50 bg-black ">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -44,7 +57,10 @@ const Navbar = () => {
       >
         <div className="flex justify-between h-16 ">
           {/* Logo */}
-          <div className="flex-shrink-0 flex items-center">
+          <div
+            onClick={navi}
+            className="flex-shrink-0 flex items-center"
+          >
             <img
               src="/chaicode-logo.svg"
               alt=""
@@ -119,7 +135,7 @@ const Navbar = () => {
             >
               <div className="flex justify-between items-center h-14 px-4  border-gray-800 ">
                 {/* Logo */}
-                <div className="flex-shrink-0 flex items-center ">
+                <div onClick={navi} className="flex-shrink-0 flex items-center ">
                   <img
                     src="/chaicode-logo.svg"
                     alt=""
@@ -141,7 +157,8 @@ const Navbar = () => {
                 <nav className="flex flex-col space-y-4 mt-5">
                   {menuItems.map((item) => (
                     <>
-                      <button
+                      <Link
+                        to={item.link}
                         key={item.id}
                         onClick={() => {
                           if (item.action) item.action();
@@ -153,7 +170,7 @@ const Navbar = () => {
                           {item.icon}
                         </span>{" "}
                         <span className="text-white">{item.name}</span>
-                      </button>
+                      </Link>
                     </>
                   ))}
                 </nav>
@@ -194,7 +211,7 @@ const Navbar = () => {
             >
               <div className="flex justify-between items-center h-14 px-4  border-gray-800 ">
                 {/* Logo */}
-                <div className="flex-shrink-0 flex items-center ">
+                <div onClick={navi} className="flex-shrink-0 flex items-center ">
                   <img
                     src="/chaicode-logo.svg"
                     alt=""
@@ -216,7 +233,8 @@ const Navbar = () => {
                 {/* Top Navigation */}
                 <nav className="flex flex-col space-y-2 mt-5">
                   {menuItems.map((item) => (
-                    <button
+                    <Link
+                      to={item.link}
                       key={item.id}
                       onClick={() => {
                         if (item.action) item.action();
@@ -228,7 +246,7 @@ const Navbar = () => {
                         {item.icon}
                       </span>
                       <span className="text-white">{item.name}</span>
-                    </button>
+                    </Link>
                   ))}
                 </nav>
 

@@ -1,8 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-
 const HeroSection = () => {
-    
   const stats = [
     { value: "1000+", label: "Review" },
     { value: "500+", label: "Comment" },
@@ -96,7 +94,7 @@ const HeroSection = () => {
               },
             },
           }}
-          className="mt-8 flex flex-wrap justify-center gap-4"
+          className="mt-8 flex flex-wrap justify-center gap-4 mb-20"
         >
           {[
             { label: "Share Reviews Instantly", icon: "🚀" },
@@ -118,20 +116,7 @@ const HeroSection = () => {
           ))}
         </motion.div>
 
-        {/* Button */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.8 }}
-          className="mt-10"
-        >
-          <button className="bg-gradient-to-r from-orange-400 to-yellow-500 hover:from-orange-500 hover:to-yellow-600 text-black font-semibold py-3 px-6 rounded-full shadow-lg text-lg transition-all mb-10">
-            🚀 Start Reviewing now
-          </button>
-        </motion.div>
-
-        {/* Optional: Background Glow */}
-        <div className="absolute bottom-0 w-full h-1/2 bg-gradient-to-t from-orange-500/30 to-transparent blur-2xl opacity-60" />
+        <div className="absolute bottom-0 w-full h-full bg-gradient-to-t from-orange-500/30 to-transparent blur-2xl opacity-60" />
       </div>
 
       <div className=" mt-5 text-gray-400 flex  items-center justify-center">
