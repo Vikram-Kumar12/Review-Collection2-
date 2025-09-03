@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { IoMdShare } from "react-icons/io";
 const ReviewModal = ({ reviewData, onClose }) => {
+  
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {

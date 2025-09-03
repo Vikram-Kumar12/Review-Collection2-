@@ -1,8 +1,9 @@
+import Role from "../models/role.models.js";
 import User from "../models/user.models.js";
 
 const loginWithGoogle = async (userData, cb) => {
   try {
-    console.log("Started!");
+    console.log("Started1!");
 
     const userDataConverted = JSON.parse(JSON.stringify(userData));
     console.log("userDataConverted :", userDataConverted);
@@ -10,10 +11,10 @@ const loginWithGoogle = async (userData, cb) => {
     const data = userDataConverted._json;
     console.log("data :", data);
 
-    const { name, email, profile } = data;
+    const { name, email, picture } = data;
     console.log("name :", name);
     console.log("email :", email);
-    console.log("profile :", profile);
+    console.log("profile :", picture);
 
     const provider = userDataConverted.provider;
     console.log("provider :", provider);
@@ -24,10 +25,15 @@ const loginWithGoogle = async (userData, cb) => {
       cb(null, existingUser);
     } else {
       console.log("New user!");
+      const roleData = await Role.find({ email });
+      console.log("roleData :", roleData);
+      const role = roleData.length > 0 ? roleData[0].role : "Public";
+      console.log("roleData1 :", roleData.length > 0 && roleData[0].role);
       const newUser = await User.create({
         name: name,
         email: email,
-        avatar: profile,
+        avatar: picture,
+        role: role,
       });
       cb(null, newUser);
     }
@@ -124,10 +130,54 @@ const userProfile = async (req, res) => {
   });
 };
 
+const refreshAccessToken = async (req, res) => {
+  const refreshToken = req.cookies?.refreshToken;
+  if (!refreshToken) {
+    return res.status(401).json({
+      error: "Token not found!",
+    });
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    console.log("Decoded :", decoded);
+  } catch (error) {
+    return res.status(404).json({ error: "Invalid or expired refresh token!" });
+  }
+
+  const user = await User.findOne({ email: decoded.email });
+  console.log("User :", user);
+  if (!user) {
+    return res.status(400).json({
+      error: "User not found!",
+    });
+  }
+
+  const newAccessToken = await user.generateAccessToken();
+  if (!newAccessToken) {
+    return res.status(500).json({ error: "Server error!" });
+  }
+
+  res.status(200).json({
+    accessToken: newAccessToken,
+    message: "New access token generated successfully!",
+  });
+};
+
+const refreshUserAuth = async (req, res) => {
+  const user = await User.findOne({ email: req.user.email }).select(
+    "-refreshToken",
+  );
+  res.status(200).json({ user });
+};
+
 export {
   loginWithGoogle,
   googleCallback,
   googleLoginFailed,
   logoutUser,
   userProfile,
+  refreshAccessToken,
+  refreshUserAuth,
 };

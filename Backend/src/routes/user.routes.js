@@ -4,6 +4,8 @@ import {
   googleCallback,
   googleLoginFailed,
   logoutUser,
+  refreshAccessToken,
+  refreshUserAuth,
   userProfile,
 } from "../controllers/user.controllers.js";
 import { isLoggedIn } from "../middlewares/auth.middlewares.js";
@@ -26,7 +28,8 @@ userRouter.get(
 
 userRouter.get("/login-with-google/failed", googleLoginFailed);
 userRouter.get("/logout",isLoggedIn, logoutUser);
+userRouter.post("/refresh-token",refreshAccessToken);
 userRouter.get("/profile",isLoggedIn, userProfile);
-
+userRouter.get("/refresh-user-auth", isLoggedIn, refreshUserAuth);
 
 export default userRouter;

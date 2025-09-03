@@ -7,7 +7,7 @@ const cohortEmails = [
   // rest student email....
 ];
 const adminEmails = [
-  "vikramkumar0120@gmail.com",
+  "vikramkumar0120arav@gmail.com",
   // rest admin email....
 ];
 
@@ -18,17 +18,17 @@ const seedRoles = async () => {
       ...adminEmails.map((email) => ({ email, role: "Admin" })),
     ];
 
-    // console.log("allEmails :", allEmails);
+    console.log("allEmails :", allEmails);
 
     for (const item of allEmails) {
       const exists = await Role.findOne({ email: item.email });
-      // console.log("exists :", exists);
+      console.log("exists :", exists);
       if (!exists) {
-        // console.log("run");
+        console.log("run");
         await Role.create(item);
       }
     }
-    // console.log("✅ Roles seeded successfully.");
+    console.log("✅ Roles seeded successfully.");
   } catch (error) {
     console.error("❌ Error seeding roles:", error);
   }

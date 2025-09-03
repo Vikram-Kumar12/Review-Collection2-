@@ -1,7 +1,11 @@
 import { useState, useRef } from "react";
-
+import { postReview } from "../../service/postReviewService.js";
+import toast from "react-hot-toast";
 export default function TweetStyleReviewForm() {
-  const [text, setText] = useState("");
+  const [tweetData, setTweetData] = useState({
+    reviewType: "Tweet",
+    content: "",
+  });
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [error, setError] = useState("");
@@ -13,9 +17,12 @@ export default function TweetStyleReviewForm() {
   const maxImages = 4;
 
   const handleTextChange = (e) => {
-    const newText = e.target.value;
-    if (newText.length <= maxChars) {
-      setText(newText);
+    const { name, value } = e.target;
+    if (value.length <= maxChars) {
+      setTweetData({
+        ...tweetData,
+        [name]: value,
+      });
       setError("");
     }
   };
@@ -83,29 +90,43 @@ export default function TweetStyleReviewForm() {
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = () => {
-    if (text.trim().length < minChars || images.length === 0) {
+  const handleSubmit = async () => {
+    if (tweetData.content.trim().length < minChars || images.length === 0) {
       setError(
         `Text (min ${minChars} chars) and at least one image are required.`
       );
-
       const form = document.querySelector(".tweet-form-container");
       form.classList.add("animate-shake");
       setTimeout(() => form.classList.remove("animate-shake"), 500);
-
       return;
     }
 
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      alert(`✅ Tweet-style Review Submitted with ${images.length} images`);
-      setText("");
+    const formData = new FormData();
+    formData.append("reviewType", "Tweet");
+    formData.append("content", tweetData.content);
+    images.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    try {
+      const response = await postReview(formData);
+      toast.success(response?.data?.message || "Review created successfully!");
+      setTweetData({
+        reviewType: "",
+        content: "",
+      });
       setImages([]);
       setImagePreviews([]);
       setError("");
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.error || "Failed to create new review!"
+      );
+    } finally {
       setIsSubmitting(false);
-    }, 1500);
+    }
   };
 
   const handleKeyPress = (e) => {
@@ -129,7 +150,8 @@ export default function TweetStyleReviewForm() {
             className="w-full  p-3 border-gray-600  border-2 rounded-md outline-none  text-lg placeholder-gray-500"
             placeholder="Share your experience in detail..."
             type="text"
-            value={text}
+            name="content"
+            value={tweetData.content}
             onChange={handleTextChange}
             onKeyPress={handleKeyPress}
             rows="6"
@@ -238,20 +260,20 @@ export default function TweetStyleReviewForm() {
           <div className="flex items-center space-x-4">
             <div
               className={`text-sm ${
-                text.length > maxChars - 20
+                tweetData.content.length > maxChars - 20
                   ? "text-yellow-500"
                   : "text-gray-400"
-              } ${text.length > maxChars ? "text-red-500" : ""}`}
+              } ${tweetData.content.length > maxChars ? "text-red-500" : ""}`}
             >
-              {text.length}/{maxChars}
+              {tweetData.content.length}/{maxChars}
             </div>
 
             <button
               onClick={handleSubmit}
               disabled={
                 isSubmitting ||
-                text.length < minChars ||
-                text.length > maxChars ||
+                tweetData.content.length < minChars ||
+                tweetData.content.length > maxChars ||
                 images.length === 0
               }
               className="bg-blue-500 text-white px-4 py-2 rounded-full font-bold hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105"

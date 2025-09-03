@@ -24,11 +24,6 @@ export const createReview = async (req, res) => {
     const imageUrls = [];
     let videoUrl = null;
 
-    // console.log("Review Type:", reviewType);
-    // console.log("Content:", content);
-    // console.log("Images:", req.files?.images);
-    // console.log("Video:", req.files?.video?.[0]);
-
     if (reviewType === "Tweet" && req.files?.images) {
       for (let img of req.files.images) {
         const result = await new Promise((resolve, reject) => {

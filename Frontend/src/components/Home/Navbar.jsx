@@ -6,11 +6,19 @@ import { CiSquarePlus } from "react-icons/ci";
 import { MdOutlineDashboardCustomize } from "react-icons/md";
 import { FiUser } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
+import useAuth from "../../hooks/useAuth.js";
+import { logoutUser } from "../../service/authService.js";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { logout } from "../../features/auth/authSlice.js";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { user, isAuth } = useAuth();
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -46,6 +54,20 @@ const Navbar = () => {
   const navi = () => {
     navigate("/");
   };
+
+  const logoutHandler = async () => {
+    setIsLoggedIn(true);
+    try {
+      const response = await logoutUser();
+      toast.success(response?.data?.message || "Logout successfully!");
+      dispatch(logout());
+      setIsMenuOpen(false);
+    } catch (error) {
+      toast.error(error?.response?.data?.error || "Logout request failed!");
+    } finally {
+      setIsLoggedIn(false);
+    }
+  };
   return (
     <nav className="text-white shadow-lg fixed top-0 px-1 md:px-5 lg:px-0 left-0 right-0 z-50 bg-black ">
       <motion.div
@@ -57,10 +79,7 @@ const Navbar = () => {
       >
         <div className="flex justify-between h-16 ">
           {/* Logo */}
-          <div
-            onClick={navi}
-            className="flex-shrink-0 flex items-center"
-          >
+          <div onClick={navi} className="flex-shrink-0 flex items-center">
             <img
               src="/chaicode-logo.svg"
               alt=""
@@ -73,7 +92,20 @@ const Navbar = () => {
 
           {/* Desktop buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            {!isMobile && !isLoggedIn && (
+            {isAuth ? (
+              <Link
+                to="/profile"
+                className="w-10 h-10 rounded-full flex items-center justify-center bg-[#FAE8D0] text-black font-semibold"
+              >
+                {user?.user?.avatar && (
+                  <img
+                    src={user.user.avatar}
+                    alt="avatar"
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                )}
+              </Link>
+            ) : (
               <Link
                 to="/login"
                 onClick={toggleLogin}
@@ -81,17 +113,6 @@ const Navbar = () => {
               >
                 Login
               </Link>
-            )}
-            {!isMobile && isLoggedIn && (
-              <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center ">
-                  <img
-                    src="/assets/images/hiteshsir.png"
-                    alt=""
-                    className="w-full h-full object-cover rounded-full cursor-pointer"
-                  />
-                </div>
-              </div>
             )}
             <button
               onClick={() => setIsMenuOpen(true)}
@@ -135,7 +156,10 @@ const Navbar = () => {
             >
               <div className="flex justify-between items-center h-14 px-4  border-gray-800 ">
                 {/* Logo */}
-                <div onClick={navi} className="flex-shrink-0 flex items-center ">
+                <div
+                  onClick={navi}
+                  className="flex-shrink-0 flex items-center "
+                >
                   <img
                     src="/chaicode-logo.svg"
                     alt=""
@@ -154,9 +178,10 @@ const Navbar = () => {
               </div>
 
               <div className="p-2 flex flex-col justify-between h-[650px]">
-                <nav className="flex flex-col space-y-4 mt-5">
-                  {menuItems.map((item) => (
-                    <>
+                {user?.user?.role === "Cohort" ||
+                user?.user?.role === "Admin" ? (
+                  <nav className="flex flex-col space-y-2 mt-5">
+                    {menuItems.map((item) => (
                       <Link
                         to={item.link}
                         key={item.id}
@@ -164,25 +189,47 @@ const Navbar = () => {
                           if (item.action) item.action();
                           setIsMenuOpen(false);
                         }}
-                        className="text-left text-xl hover:bg-[#2B211B] py-3 px-4 rounded-md shadow-xl flex items-center gap-2 text-[#F97316] hover:text-[#EA580C] cursor-pointer border-1 border-gray-800"
+                        className="text-left text-xl hover:bg-[#2B211B] py-3 px-4 rounded-md shadow-xl flex items-center gap-2 text-[#F97316] hover:text-[#EA580C] cursor-pointer"
                       >
-                        <span className="bg-[#59361C] px-2 py-2 rounded-md  text-2xl">
+                        <span className="bg-[#59361C] px-2 py-2 rounded-md text-2xl">
                           {item.icon}
-                        </span>{" "}
-                        <span className="text-white">{item.name}</span>
+                        </span>
+                        <span className="text-white">{item.name}s</span>
                       </Link>
-                    </>
-                  ))}
-                </nav>
+                    ))}
+                  </nav>
+                ) : (
+                  <nav className="flex flex-col space-y-2 mt-5">
+                    <Link
+                      to="/profile"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                      }}
+                      className="text-left text-xl hover:bg-[#2B211B] py-3 px-4 rounded-md shadow-xl flex items-center gap-2 text-[#F97316] hover:text-[#EA580C] cursor-pointer"
+                    >
+                      <span className="bg-[#59361C] px-2 py-2 rounded-md text-2xl">
+                        <FiUser />
+                      </span>
+                      <span className="text-white">Profile</span>
+                    </Link>
+                  </nav>
+                )}
 
-                <Link
-                  to="/login"
-                  className="w-full text-xl bg-[#F97316] py-3 px-4 rounded-md text-white hover:bg-[#EA580C] text-center cursor-pointer inline-block"
-                >
-                  Login
-                </Link>
-
-                {/* <Link to='/login' className="w-full text-xl bg-[#F97316] py-3 px-4 rounded-md text-white hover:bg-[#EA580C] text-center cursor-pointer inline-block">Logout</Link> */}
+                {isAuth ? (
+                  <button
+                    onClick={logoutHandler}
+                    className="w-full text-xl bg-[#F97316] py-3 px-4 rounded-md text-white hover:bg-[#EA580C] text-center cursor-pointer inline-block"
+                  >
+                    {isLoggedIn ? "Logout...." : "Logout"}
+                  </button>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="w-full text-xl bg-[#F97316] py-3 px-4 rounded-md text-white hover:bg-[#EA580C] text-center cursor-pointer inline-block"
+                  >
+                    Login
+                  </Link>
+                )}
               </div>
             </motion.div>
           </>
@@ -211,7 +258,10 @@ const Navbar = () => {
             >
               <div className="flex justify-between items-center h-14 px-4  border-gray-800 ">
                 {/* Logo */}
-                <div onClick={navi} className="flex-shrink-0 flex items-center ">
+                <div
+                  onClick={navi}
+                  className="flex-shrink-0 flex items-center "
+                >
                   <img
                     src="/chaicode-logo.svg"
                     alt=""
@@ -230,38 +280,58 @@ const Navbar = () => {
               </div>
 
               <div className="p-2 flex flex-col justify-between h-full">
-                {/* Top Navigation */}
-                <nav className="flex flex-col space-y-2 mt-5">
-                  {menuItems.map((item) => (
+                {user?.user?.role === "Cohort" ||
+                user?.user?.role === "Admin" ? (
+                  <nav className="flex flex-col space-y-2 mt-5">
+                    {menuItems.map((item) => (
+                      <Link
+                        to={item.link}
+                        key={item.id}
+                        onClick={() => {
+                          if (item.action) item.action();
+                          setIsMenuOpen(false);
+                        }}
+                        className="text-left text-xl hover:bg-[#2B211B] py-3 px-4 rounded-md shadow-xl flex items-center gap-2 text-[#F97316] hover:text-[#EA580C] cursor-pointer"
+                      >
+                        <span className="bg-[#59361C] px-2 py-2 rounded-md text-2xl">
+                          {item.icon}
+                        </span>
+                        <span className="text-white">{item.name}</span>
+                      </Link>
+                    ))}
+                  </nav>
+                ) : (
+                  <nav className="flex flex-col space-y-2 mt-5">
                     <Link
-                      to={item.link}
-                      key={item.id}
+                      to="/profile"
                       onClick={() => {
-                        if (item.action) item.action();
                         setIsMenuOpen(false);
                       }}
                       className="text-left text-xl hover:bg-[#2B211B] py-3 px-4 rounded-md shadow-xl flex items-center gap-2 text-[#F97316] hover:text-[#EA580C] cursor-pointer"
                     >
                       <span className="bg-[#59361C] px-2 py-2 rounded-md text-2xl">
-                        {item.icon}
+                        <FiUser />
                       </span>
-                      <span className="text-white">{item.name}</span>
+                      <span className="text-white">Profile</span>
                     </Link>
-                  ))}
-                </nav>
+                  </nav>
+                )}
 
-                <Link
-                  to="/login"
-                  className="w-full text-xl bg-[#F97316] py-3 px-4 rounded-md text-white hover:bg-[#EA580C] text-center cursor-pointer inline-block"
-                >
-                  Login
-                </Link>
-                {/* <Link
-                  to="/login"
-                  className="w-full text-xl bg-[#F97316] py-3 px-4 rounded-md text-white hover:bg-[#EA580C] text-center cursor-pointer inline-block"
-                >
-                  Logout
-                </Link> */}
+                {isAuth ? (
+                  <button
+                    onClick={logoutHandler}
+                    className="w-full text-xl bg-[#F97316] py-3 px-4 rounded-md text-white hover:bg-[#EA580C] text-center cursor-pointer inline-block"
+                  >
+                    {isLoggedIn ? "Logout...." : "Logout"}
+                  </button>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="w-full text-xl bg-[#F97316] py-3 px-4 rounded-md text-white hover:bg-[#EA580C] text-center cursor-pointer inline-block"
+                  >
+                    Login
+                  </Link>
+                )}
               </div>
             </motion.div>
           </>

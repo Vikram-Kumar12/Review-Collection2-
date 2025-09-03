@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../../service/authService.js";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -28,9 +29,11 @@ const Login = () => {
     },
   };
 
+
   const backToHome = () => {
     navigate("/");
   };
+
   return (
     <div className="min-h-screen bg-[#000000] flex items-center justify-center px-4 pt-15">
       <motion.div
@@ -68,6 +71,7 @@ const Login = () => {
 
           <motion.div className="space-y-4 mb-8" variants={containerVariants}>
             <motion.button
+              onClick={()=>loginUser()}
               variants={itemVariants}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}

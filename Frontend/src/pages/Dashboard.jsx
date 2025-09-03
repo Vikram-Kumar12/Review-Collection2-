@@ -1,73 +1,45 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
+import ReviewModal from "../components/Home/ReviewModal";
+import useAuth from "../hooks/useAuth.js";
+import ListedReviewCard from "../components/Home/ListedReviewCard.jsx";
 
 const dummyReviews = [
   {
-    id: 1,
-    type: "text",
-    content:
-      "This platform is absolutely amazing! The user experience is seamless and the features are incredibly useful for my learning journey. 🎉 ",
-    createdAt: "2025-09-01 10:20 AM",
-    author: "Sarah Johnson",
-    cohort: "Web Development Cohort 2025",
+    user: "Hitesh Choudhary",
+    time: "2 hours ago",
+    review:
+      "This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.",
+    likes: 125,
+    comments: 100,
+    type: "text", // 👈 text only
   },
   {
-    id: 2,
-    type: "tweet",
-    content:
-      "Just completed my first project using this platform! The resources and community support made all the difference. 💻🔥 #CodingJourney",
-    image:
-      "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    createdAt: "2025-09-01 08:10 AM",
-    author: "Alex Chen",
-    cohort: "Data Science Cohort 2025",
+    user: "Hitesh Choudhary",
+    time: "1 hour ago",
+    review:
+      "This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.",
+    image: "/assets/images/hiteshsir.png", // 👈 add image path
+    likes: 45,
+    comments: 20,
+    type: "tweet", // 👈 text + image
   },
   {
-    id: 3,
-    type: "video",
-    content:
-      "Here's my video review of the platform after 3 months of use. The mentorship program is exceptional!",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-    createdAt: "2025-08-31 06:30 PM",
-    author: "Maria Rodriguez",
-    cohort: "UX Design Cohort 2025",
-  },
-  {
-    id: 4,
-    type: "text",
-    content:
-      "The project feedback I received was incredibly detailed and helped me improve my code quality significantly.",
-    createdAt: "2025-08-30 02:15 PM",
-    author: "James Wilson",
-    cohort: "Web Development Cohort 2025",
-  },
-  {
-    id: 5,
-    type: "tweet",
-    content:
-      "Just got paired with an amazing mentor through this platform! So grateful for this opportunity. 🙏 #CareerGrowth",
-    image:
-      "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-    createdAt: "2025-08-29 11:45 AM",
-    author: "Priya Sharma",
-    cohort: "Data Science Cohort 2025",
-  },
-  {
-    id: 6,
-    type: "video",
-    content:
-      "My final project showcase! This platform helped me build a portfolio I'm truly proud of.",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-    createdAt: "2025-08-28 09:30 AM",
-    author: "David Kim",
-    cohort: "UX Design Cohort 2025",
+    user: "Hitesh Choudhary",
+    time: "30 minutes ago",
+    review:
+      "This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.",
+    video: "/assets/videos/sample.mp4", // 👈 add video path
+    likes: 230,
+    comments: 80,
+    type: "video", // 👈 video + text
   },
 ];
 
 const userData = {
   name: "Sarah Johnson",
-  role: "admin",
+  role: "cohort",
   cohort: "Web Development Cohort 2025",
   joinDate: "January 2025",
   reviewsCount: 12,
@@ -78,8 +50,10 @@ export default function UserDashboard() {
   const [filter, setFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState(userData);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [selectedReview, setSelectedReview] = useState(null);
+
+  const { user } = useAuth();
 
   useEffect(() => {
     const handleResize = () => {
@@ -104,9 +78,8 @@ export default function UserDashboard() {
   const searchedReviews = searchQuery
     ? filteredReviews.filter(
         (review) =>
-          review.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          review.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          review.cohort.toLowerCase().includes(searchQuery.toLowerCase())
+          review.review.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          review.user.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : filteredReviews;
 
@@ -167,20 +140,22 @@ export default function UserDashboard() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <h1 className="text-3xl font-bold  bg-gradient-to-r bg-clip-text text-transparent from-[#FE9332] to-[#EA580C]">
-                {user.role === "admin"
+                {user?.user?.role === "Admin"
                   ? "Admin Dashboard"
                   : "My Learning Dashboard"}
               </h1>
               <p className="text-gray-200 mt-2">
-                {user.role === "admin"
+                {user?.user?.role === "Admin"
                   ? "Manage all reviews and content"
-                  : `Welcome back, ${user.name}! You've submitted ${user.reviewsCount} reviews so far.`}
+                  : `Welcome back, ${user?.user?.name}! You've submitted ${user.reviewsCount} reviews so far.`}
               </p>
             </div>
 
             <div className="flex items-center gap-2 bg-gradient-to-r from-orange-500 via-orange-600 to-yellow-600 text-white px-4 py-2 rounded-full">
               <span className="text-sm font-medium">
-                {user.role === "admin" ? "Administrator" : user.cohort}
+                {user?.user?.role === "Admin"
+                  ? "Administrator"
+                  : "Web Development Cohort 2025"}
               </span>
             </div>
           </div>
@@ -262,7 +237,7 @@ export default function UserDashboard() {
         </motion.div>
 
         {/* Admin View */}
-        {user.role === "admin" && (
+        {user?.user?.role === "Admin" && (
           <>
             <motion.div
               initial={{ opacity: 0, y: -10 }}
@@ -369,11 +344,11 @@ export default function UserDashboard() {
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center">
                           <div className="h-10 w-10 flex-shrink-0 bg-orange-200 rounded-full flex items-center justify-center text-black font-medium">
-                            {review.author.charAt(0)}
+                            {review.user.charAt(0)}
                           </div>
                           <div className="ml-3">
                             <div className="text-lg font-medium text-white">
-                              {review.author}
+                              {review.user}
                             </div>
                           </div>
                         </div>
@@ -390,13 +365,16 @@ export default function UserDashboard() {
                         </span>
                       </div>
 
-                      <div className="text-sm text-gray-200 mb-3">
-                        {review.content}
+                      <div
+                        onClick={() => setSelectedReview(review)}
+                        className="text-sm text-gray-200 mb-3"
+                      >
+                        {review.review}
                       </div>
 
                       <div className="flex justify-between items-center">
                         <span className="text-xs text-gray-400">
-                          {review.createdAt}
+                          {review.time}
                         </span>
                         <motion.button
                           whileHover={{ scale: 1.05 }}
@@ -451,11 +429,11 @@ export default function UserDashboard() {
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
                                 <div className="h-10 w-10 flex-shrink-0 bg-orange-200 rounded-full flex items-center justify-center text-black font-medium">
-                                  {review.author.charAt(0)}
+                                  {review.user.charAt(0)}
                                 </div>
                                 <div className="ml-4">
                                   <div className="text-sm font-medium text-white">
-                                    {review.author}
+                                    {review.user}
                                   </div>
                                 </div>
                               </div>
@@ -474,12 +452,15 @@ export default function UserDashboard() {
                               </span>
                             </td>
                             <td className="px-6 py-4">
-                              <div className="text-sm text-white ">
-                                {review.content}
+                              <div
+                                onClick={() => setSelectedReview(review)}
+                                className="text-sm text-white "
+                              >
+                                {review.review}
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
-                              {review.createdAt}
+                              {review.time}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                               <motion.button
@@ -533,7 +514,7 @@ export default function UserDashboard() {
         )}
 
         {/* Stats for Student */}
-        {user.role === "cohort" && (
+        {user?.user?.role === "Cohort" && (
           <motion.div
             variants={containerVariants}
             initial="hidden"
@@ -549,17 +530,20 @@ export default function UserDashboard() {
                   exit={{ opacity: 0, scale: 0.9 }}
                   className="border-2 border-gray-700 rounded-2xl shadow-2xl overflow-hidden hover:shadow-xl transition-shadow duration-300  h-fit"
                 >
-                  <div className="p-6">
-                    <div className="flex justify-between items-start mb-4">
+                  <div
+                    onClick={() => setSelectedReview(review)}
+                    className="p-6"
+                  >
+                    <div className="flex  justify-between items-start mb-4">
                       <span className="text-xs font-medium px-2 py-1 rounded-full text-black bg-gray-200 ">
                         {review.type.toUpperCase()}
                       </span>
                       <span className="text-xs text-gray-300">
-                        {review.createdAt}
+                        {review.time}
                       </span>
                     </div>
 
-                    <p className="text-gray-100 mt-5 mb-4 ">{review.content}</p>
+                    <p className="text-gray-100 mt-5 mb-4 ">{review.review}</p>
 
                     {review.image && (
                       <div className="mb-4 rounded-lg overflow-hidden border border-gray-700 hover:scale-105 duration-300">
@@ -571,13 +555,13 @@ export default function UserDashboard() {
                       </div>
                     )}
 
-                    {review.videoUrl && (
+                    {review.video && (
                       <div className="mb-4 rounded-lg overflow-hidden  border border-gray-700">
                         <video
                           controls
                           className="w-full h-full object-contain"
                         >
-                          <source src={review.videoUrl} type="video/mp4" />
+                          <source src={review.video} type="video/mp4" />
                         </video>
                       </div>
                     )}
@@ -587,7 +571,7 @@ export default function UserDashboard() {
             </AnimatePresence>
           </motion.div>
         )}
-        {user.role === "cohort" && searchedReviews.length === 0 && (
+        {user?.user?.role === "Cohort" && searchedReviews.length === 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -624,6 +608,19 @@ export default function UserDashboard() {
             </div>
           </motion.div>
         )}
+
+        {/* Modal */}
+        <div className="h-full">
+          <div className="h-full">
+            {selectedReview && (
+              <ReviewModal
+                reviewData={selectedReview}
+                onClose={() => setSelectedReview(null)}
+              />
+            )}
+          </div>
+        </div>
+
       </div>
     </div>
   );
