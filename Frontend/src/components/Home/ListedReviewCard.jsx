@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { IoMdShare } from "react-icons/io";
 const ListedReviewCard = ({
   user,
+  authorImg,
   time,
   review,
   image,
@@ -26,41 +27,36 @@ const ListedReviewCard = ({
     };
   }, []);
 
+
+
   return (
     <div
       onClick={onClick}
-      className="flex-shrink-0 cursor-pointer w-full h-fit max-w-sm p-4 rounded-md border border-orange-500 lg:border-gray-800 hover:border-orange-500 bg-black text-white transition-all duration-700 "
+      className="flex-shrink-0 cursor-pointer w-full  max-w-sm p-4 rounded-md "
     >
       {/* Terminal header */}
-      <div className="flex items-center space-x-2 mb-3 ">
+      <div className="flex  items-center space-x-2 mb-3 ">
         <span className="w-3 h-3 bg-red-500 rounded-full"></span>
         <span className="w-3 h-3 bg-yellow-400 rounded-full"></span>
         <span className="w-3 h-3 bg-green-500 rounded-full"></span>
       </div>
 
-      <div className="flex items-center space-x-3 mb-2">
-        <img
-          src="/assets/images/hiteshsir.png"
-          alt="avatar"
-          className="w-10 h-10 rounded-full"
-        />
+      <div className="flex items-center space-x-3 mb-2 overflow-hidden">
+        <img src={authorImg} alt="avatar" className="w-10 h-10 rounded-full" />
         <div>
           <h4 className="font-bold">{user}</h4>
-          <p className="text-xs text-gray-400">{time}</p>
+          <p className="text-xs text-gray-400">{time?.slice(0, 10)}</p>
         </div>
       </div>
-
-      <p className="text-sm leading-snug mb-4">{review}</p>
-
-      {type === "tweet" && image && (
+      <p className="text-sm leading-snug mb-4 mt-5">{review}</p>
+      {type === "Tweet" && image && (
         <img
           src={image}
           alt="tweet"
-          className="w-full object-cover rounded mt-2 h-[150px]"
+          className="w-full object-contain rounded mt-2 h-[150px]"
         />
       )}
-
-      {type === "video" && video && (
+      {type === "Video" && video && (
         <video controls className="w-full rounded mt-2">
           <source src={video} type="video/mp4" />
           Your browser does not support the video tag.

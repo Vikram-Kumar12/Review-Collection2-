@@ -6,12 +6,11 @@ import { Link } from "react-router-dom";
 const Profile = () => {
   const [editMode, setEditMode] = useState(false);
   const { user } = useAuth();
-
   const [profileData, setProfileData] = useState({
-    fullName: user?.user?.name,
-    username: user?.user?.email?.split("@")[0],
-    email: user?.user?.email,
-    role: user?.user?.role,
+    fullName: user?.name,
+    username: user?.email?.split("@")[0],
+    email: user?.email,
+    role: user?.role,
   });
   const handleChange = (e) => {
     setProfileData({ ...profileData, [e.target.name]: e.target.value });
@@ -31,21 +30,23 @@ const Profile = () => {
       <div className="max-w-4xl w-full border-2 border-gray-700 rounded-lg shadow-lg p-6 space-y-6">
         {/* Desktop-view */}
         <div className="hidden lg:flex items-center space-x-4">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center text-md lg:text-2xl font-bold">
-            {user?.user?.avatar && (
+          <div className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center text-md lg:text-2xl font-bold">
+            {user?.avatar && (
               <img
-                src={user?.user?.avatar}
+                src={user.avatar}
                 alt="avatar"
-                className="w-full h-full object-cover rounded-full"
+                className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
               />
             )}
           </div>
+
           <div className="flex-1">
             <h2 className="text-2xl font-semibold bg-gradient-to-r bg-clip-text text-transparent from-orange-500 via-orange-600 to-orange-700">
-              {user?.user?.name}
+              {user?.name}
             </h2>
-            <p className="text-gray-400">@{user?.user?.email?.split("@")[0]}</p>
-            <p className="text-gray-400">{user?.user?.email}</p>
+            <p className="text-gray-400">@{user?.email?.split("@")[0]}</p>
+            <p className="text-gray-400">{user?.email}</p>
           </div>
           <button
             onClick={() => setEditMode(!editMode)}
@@ -66,9 +67,9 @@ const Profile = () => {
           </div>
           <div className="flex space-x-4">
             <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center text-xl font-bold text-black">
-              {user?.user?.avatar && (
+              {user?.avatar && (
                 <img
-                  src={user?.user?.avatar}
+                  src={user?.avatar}
                   alt="avatar"
                   className="w-full h-full object-cover rounded-full"
                 />
@@ -76,12 +77,12 @@ const Profile = () => {
             </div>
             <div className="flex-1">
               <h2 className="text-2xl font-semibold bg-gradient-to-r bg-clip-text text-transparent from-orange-500 via-orange-600 to-orange-700">
-                {user?.user?.name}
+                {user?.name}
               </h2>
               <p className="text-gray-400">
-                @{user?.user?.email?.split("@")[0]}
+                @{user?.email?.split("@")[0]}
               </p>
-              <p className="text-gray-400">{user?.user?.email}</p>
+              <p className="text-gray-400">{user?.email}</p>
             </div>
           </div>
         </div>
@@ -102,7 +103,7 @@ const Profile = () => {
                   className="w-full mt-1 p-2 bg-[#1e1e1e] text-white border border-gray-600 rounded"
                 />
               ) : (
-                <p className="font-semibold">{user?.user?.name}</p>
+                <p className="font-semibold">{user?.name}</p>
               )}
             </div>
             <div>
@@ -117,21 +118,21 @@ const Profile = () => {
                 />
               ) : (
                 <p className="text-white">
-                  @{user?.user?.email?.split("@")[0]}
+                  @{user?.email?.split("@")[0]}
                 </p>
               )}
             </div>
             <div>
               <label className="text-sm text-gray-400">Email</label>
               <p className="w-full mt-1 p-2 bg-[#1e1e1e] text-white border border-gray-600 rounded">
-                {user?.user?.email}
+                {user?.email}
                 <span className="ml-2 text-sm">🔒</span>
               </p>
             </div>
             <div>
               <label className="text-sm text-gray-400">Role</label>
               <p className="w-full mt-1 p-2 bg-[#1e1e1e] text-white border border-gray-600 rounded">
-                {user?.user?.role}
+                {user?.role}
                 <span className="ml-2 text-sm">🔒</span>
               </p>
             </div>

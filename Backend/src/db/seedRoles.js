@@ -18,13 +18,9 @@ const seedRoles = async () => {
       ...adminEmails.map((email) => ({ email, role: "Admin" })),
     ];
 
-    console.log("allEmails :", allEmails);
-
     for (const item of allEmails) {
       const exists = await Role.findOne({ email: item.email });
-      console.log("exists :", exists);
       if (!exists) {
-        console.log("run");
         await Role.create(item);
       }
     }

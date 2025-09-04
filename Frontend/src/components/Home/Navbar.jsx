@@ -18,7 +18,8 @@ const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user, isAuth } = useAuth();
-
+  
+  
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -95,11 +96,11 @@ const Navbar = () => {
             {isAuth ? (
               <Link
                 to="/profile"
-                className="w-10 h-10 rounded-full flex items-center justify-center bg-[#FAE8D0] text-black font-semibold"
+                className="w-10 h-10 rounded-full flex items-center justify-center bg-[#FAE8D0] text-black font-semibold overflow-hidden"
               >
-                {user?.user?.avatar && (
+                {user?.avatar && (
                   <img
-                    src={user.user.avatar}
+                    src={user?.avatar}
                     alt="avatar"
                     className="w-full h-full object-cover rounded-full"
                   />
@@ -178,8 +179,8 @@ const Navbar = () => {
               </div>
 
               <div className="p-2 flex flex-col justify-between h-[650px]">
-                {user?.user?.role === "Cohort" ||
-                user?.user?.role === "Admin" ? (
+                {user?.role === "Cohort" ||
+                user?.role === "Admin" ? (
                   <nav className="flex flex-col space-y-2 mt-5">
                     {menuItems.map((item) => (
                       <Link
@@ -280,8 +281,8 @@ const Navbar = () => {
               </div>
 
               <div className="p-2 flex flex-col justify-between h-full">
-                {user?.user?.role === "Cohort" ||
-                user?.user?.role === "Admin" ? (
+                {user?.role === "Cohort" ||
+                user?.role === "Admin" ? (
                   <nav className="flex flex-col space-y-2 mt-5">
                     {menuItems.map((item) => (
                       <Link

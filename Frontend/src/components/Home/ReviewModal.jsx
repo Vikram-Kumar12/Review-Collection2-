@@ -1,13 +1,31 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { IoMdShare } from "react-icons/io";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+
 const ReviewModal = ({ reviewData, onClose }) => {
-  
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = "auto";
     };
   }, []);
+
+  const isTweetWithImages =
+    reviewData?.reviewType === "Tweet" && reviewData?.imageUrl?.length > 0;
+
+  const goPrev = () => {
+    setCurrentImageIndex((prev) =>
+      prev === 0 ? reviewData.imageUrl.length - 1 : prev - 1
+    );
+  };
+
+  const goNext = () => {
+    setCurrentImageIndex((prev) =>
+      prev === reviewData.imageUrl.length - 1 ? 0 : prev + 1
+    );
+  };
 
   return (
     <div className="fixed inset-0 z-50  bg-opacity-70 min:h-screen   px-4 bg-[rgba(37,26,18,0.6)] backdrop-blur-md py-10 flex  items-center justify-center">
@@ -27,31 +45,75 @@ const ReviewModal = ({ reviewData, onClose }) => {
             <span className="w-3 h-3 bg-yellow-400 rounded-full" />
             <span className="w-3 h-3 bg-green-500 rounded-full" />
           </div>
+
           <div className="flex items-center space-x-3 mb-2">
             <img
-              src="/assets/images/hiteshsir.png"
+              src={reviewData?.author?.avatar}
               className="w-10 h-10 rounded-full"
             />
             <div>
-              <h4 className="font-bold">{reviewData.user}</h4>
-              <p className="text-xs text-gray-400">{reviewData.time}</p>
+              <h4 className="font-bold">{reviewData?.author?.name}</h4>
+              <p className="text-xs text-gray-400">
+                {reviewData?.createdAt?.slice(0, 10)}
+              </p>
             </div>
           </div>
-          <p className="text-sm leading-snug mb-4">{reviewData.review}</p>
 
-          {reviewData.type === "tweet" && reviewData.image && (
-            <div className="w-full h-[400px]">
-              <img
-                src={reviewData.image}
-                alt="tweet"
-                className="w-full object-cover rounded mt-2 h-full"
-              />
+          <p className="text-sm leading-snug mb-4 mt-5">
+            {reviewData?.content}
+          </p>
+
+          {isTweetWithImages && (
+            <div className="relative w-full h-auto mt-3">
+              {reviewData.imageUrl.length === 1 ? (
+                // Single Image Layout
+                <img
+                  src={reviewData.imageUrl[0]}
+                  alt="tweet"
+                  className="w-full rounded-md oobject-contain h-[350px]"
+                />
+              ) : (
+                // Multiple Images with Slider
+                <div className="relative">
+                  <img
+                    src={reviewData.imageUrl[currentImageIndex]}
+                    alt={`tweet-${currentImageIndex}`}
+                    className="w-full h-[350px] object-contain rounded-md"
+                  />
+                  {/* Navigation Buttons */}
+                  <button
+                    onClick={goPrev}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-1 rounded-full hover:bg-black/60"
+                  >
+                    <IoIosArrowBack size={24} />
+                  </button>
+                  <button
+                    onClick={goNext}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-1 rounded-full hover:bg-black/60"
+                  >
+                    <IoIosArrowForward size={24} />
+                  </button>
+
+                  <div className="flex justify-center mt-2 space-x-2">
+                    {reviewData.imageUrl.map((_, index) => (
+                      <div
+                        key={index}
+                        className={`w-2 h-2 rounded-full ${
+                          index === currentImageIndex
+                            ? "bg-orange-500"
+                            : "bg-gray-500"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
-          {reviewData.type === "video" && reviewData.video && (
+          {reviewData?.reviewType === "Video" && reviewData?.videoUrl && (
             <video controls className="w-full rounded mt-2 h-[350px]">
-              <source src={reviewData.video} type="video/mp4" />
+              <source src={reviewData?.videoUrl} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           )}
@@ -62,9 +124,9 @@ const ReviewModal = ({ reviewData, onClose }) => {
               }}
               className="cursor-pointer"
             >
-              ❤️ {reviewData.likes}
+              ❤️ {reviewData?.likesCount}
             </span>
-            <span>💬 {reviewData.comments}</span>
+            <span>💬 {reviewData?.commentCount}</span>
             <span
               onClick={() => {
                 alert("Share button click!");
@@ -93,7 +155,7 @@ const ReviewModal = ({ reviewData, onClose }) => {
         {/* Comment Section */}
         <div className="space-y-3  overflow-y-auto mb-4 mt-5 scrollbar-hide">
           {/* Dummy comments */}
-          {[...Array(5)].map((_, i) => (
+          {/* {[...Array(5)].map((_, i) => (
             <div key={i} className="bg-gray-800 p-2 rounded-md">
               <div className="flex items-center space-x-3 mb-2">
                 <img
@@ -101,13 +163,16 @@ const ReviewModal = ({ reviewData, onClose }) => {
                   className="w-10 h-10 rounded-full"
                 />
                 <div>
-                  <h4 className="font-bold">{reviewData.user}</h4>
-                  <p className="text-xs text-gray-400">{reviewData.time}</p>
+                  <h4 className="font-bold">{reviewData?.user}</h4>
+                  <p className="text-xs text-gray-400">{reviewData?.time}</p>
                 </div>
               </div>
-              <p className="text-sm">{reviewData.review}</p>
+              <p className="text-sm">{reviewData?.review}</p>
             </div>
-          ))}
+          ))} */}
+          <h1 className="text-xl flex items-center justify-center mt-5">
+            No comment at
+          </h1>
         </div>
       </div>
     </div>

@@ -6,3 +6,15 @@ export const postReview = async (formData) => {
     },
   });
 };
+
+export const getAllReview = async()=>{
+  return await axiosInstance.get('/review/get-all-review')
+}
+
+export const getReviewByUser = async()=>{
+  return await axiosInstance.get('/review/get-review-by-user')
+}
+
+export const deleteReviewById = async(reviewId)=>{
+  return await axiosInstance.delete(`/review/delete-review/${reviewId}`)
+}

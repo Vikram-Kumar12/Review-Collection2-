@@ -1,43 +1,29 @@
 import { useState } from "react";
 import ListedReviewCard from "./ListedReviewCard";
 import ReviewModal from "./ReviewModal";
-
-const dummyData = [
-  {
-    user: "Hitesh Choudhary",
-    time: "2 hours ago",
-    review:
-      "This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.",
-    likes: 125,
-    comments: 100,
-    type: "text", // 👈 text only
-  },
-  {
-    user: "Hitesh Choudhary",
-    time: "1 hour ago",
-    review:
-      "This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.",
-    image: "/assets/images/hiteshsir.png", // 👈 add image path
-    likes: 45,
-    comments: 20,
-    type: "tweet", // 👈 text + image
-  },
-  {
-    user: "Hitesh Choudhary",
-    time: "30 minutes ago",
-    review:
-      "This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.This is a tweet-style post with an image.",
-    video: "/assets/videos/sample.mp4", // 👈 add video path
-    likes: 230,
-    comments: 80,
-    type: "video", // 👈 video + text
-  },
-];
+import { useEffect } from "react";
+import { getAllReview } from "../../service/postReviewService.js";
+import toast from "react-hot-toast";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const ListedReviewsSection = () => {
   const [selectedReview, setSelectedReview] = useState(null);
+  const [reviewData, setReviewData] = useState(null);
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const response = await getAllReview();
+        setReviewData(response?.data?.allReviewData);
+      } catch (error) {
+        toast.error(error?.response?.data?.error || "Internal server error!");
+      }
+    };
+    fetchReviews();
+  }, []);
+
   return (
-    <section className="bg-black text-white py-10 px-4 min-h-scrren">
+    <section className="bg-black text-white py-10 px-4 min-h-screen">
       <div className="text-center">
         <div className="relative inline-block mb-2">
           <h2 className="text-3xl md:text-4xl font-bold  text-white mb-10 relative z-10">
@@ -47,22 +33,72 @@ const ListedReviewsSection = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6  ">
-        {dummyData.map((item, index) => (
-          <ListedReviewCard
+      {reviewData?.length === 0 && (
+        <div className="w-full h-full">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-12 border-2 border-gray-800 rounded-2xl shadow-lg"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-12 w-12 mx-auto text-orange-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <h3 className="mt-2 text-sm font-medium text-gray-100">
+              No reviews yet
+            </h3>
+            <p className="mt-1 text-sm text-gray-300">
+              Get started by submitting your first review!
+            </p>
+            <div className="mt-6">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-gradient-to-r from-orange-500 via-orange-600 to-yellow-600 cursor-pointer"
+              >
+                <Link to="/post-review">Submit a Review</Link>
+              </motion.button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+        {reviewData?.map((item, index) => (
+          <div
             key={index}
-            user={item.user}
-            time={item.time}
-            review={
-              item.review.slice(0, 200) + (item.review.length > 20 ? "..." : "")
-            }
-            image={item.image}
-            video={item.video}
-            type={item.type}
-            likes={item.likes}
-            comments={item.comments}
-            onClick={() => setSelectedReview(item)}
-          />
+            className="h-full flex items-center justify-center border border-orange-500 lg:border-gray-800 hover:border-orange-500 bg-black text-white transition-all duration-700 rounded-md "
+          >
+            <ListedReviewCard
+              key={index}
+              user={item?.author?.name}
+              authorImg={item?.author?.avatar}
+              time={item?.createdAt}
+              review={
+                item?.reviewType === "Text"
+                  ? item?.content?.slice(0, 600) +
+                    (item.content.length > 600 ? "..." : "")
+                  : item?.content?.slice(0, 50) +
+                    (item.content.length > 50 ? "..." : "")
+              }
+              image={item?.imageUrl[0]}
+              video={item?.videoUrl}
+              type={item?.reviewType}
+              likes={item?.likesCount}
+              comments={item?.commentCount}
+              onClick={() => setSelectedReview(item)}
+            />
+          </div>
         ))}
       </div>
 
