@@ -81,6 +81,21 @@ export default function AdminDashboard() {
     },
   };
 
+  const updateLikeCount = (reviewId, newCount) => {
+    setGetAllReviewData((prevData) =>
+      prevData.map((item) =>
+        item._id === reviewId ? { ...item, likesCount: newCount } : item
+      )
+    );
+  };
+
+  const updateCommentCount = (reviewId, newCount) => {
+    setGetAllReviewData((prevData) =>
+      prevData.map((item) =>
+        item._id === reviewId ? { ...item, commentCount: newCount } : item
+      )
+    );
+  };
 
   return (
     <div className="min-h-screen  py-8 px-4 pt-35 lg:pt-20 mt-0 lg:mt-20">
@@ -475,6 +490,8 @@ export default function AdminDashboard() {
               <ReviewModal
                 reviewData={selectedReview}
                 onClose={() => setSelectedReview(null)}
+                onLikeUpdate={updateLikeCount}
+                onCommentUpdate={updateCommentCount}
               />
             )}
           </div>

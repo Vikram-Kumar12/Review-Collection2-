@@ -49,6 +49,22 @@ export default function UserDashboard() {
     },
   };
 
+  const updateLikeCount = (reviewId, newCount) => {
+    setUserReviewData((prevData) =>
+      prevData.map((item) =>
+        item._id === reviewId ? { ...item, likesCount: newCount } : item
+      )
+    );
+  };
+
+  const updateCommentCount = (reviewId, newCount) => {
+    setUserReviewData((prevData) =>
+      prevData.map((item) =>
+        item._id === reviewId ? { ...item, commentCount: newCount } : item
+      )
+    );
+  };
+
   return (
     <div className="min-h-screen  py-8 px-4 pt-35 lg:pt-20 mt-0 lg:mt-20">
       <div className="max-w-6xl mx-auto">
@@ -155,38 +171,39 @@ export default function UserDashboard() {
         </motion.div>
 
         {/* Stats for Student */}
-        {user?.role === "Cohort" && (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6"
-          >
-            <AnimatePresence>
-              {searchedReviews?.map((review, index) => (
-                <ListedReviewCard
-                  key={index}
-                  user={review?.author?.name}
-                  authorImg={review?.author?.avatar}
-                  time={review?.createdAt}
-                  review={
-                    review?.reviewType === "Text"
-                      ? review?.content?.slice(0, 600) +
-                        (review.content.length > 600 ? "..." : "")
-                      : review?.content?.slice(0, 50) +
-                        (review.content.length > 50 ? "..." : "")
-                  }
-                  image={review?.imageUrl[0]}
-                  video={review?.videoUrl}
-                  type={review?.reviewType}
-                  likes={review?.likesCount}
-                  comments={review?.commentCount}
-                  onClick={() => setSelectedReview(review)}
-                />
-              ))}
-            </AnimatePresence>
-          </motion.div>
-        )}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6"
+        >
+          <AnimatePresence>
+            {searchedReviews?.map((review, index) => (
+              <ListedReviewCard
+                key={index}
+                reviewId={review?._id}
+                user={review?.author?.name}
+                authorImg={review?.author?.avatar}
+                time={review?.createdAt}
+                review={
+                  review?.reviewType === "Text"
+                    ? review?.content?.slice(0, 600) +
+                      (review.content.length > 600 ? "..." : "")
+                    : review?.content?.slice(0, 50) +
+                      (review.content.length > 50 ? "..." : "")
+                }
+                image={review?.imageUrl[0]}
+                video={review?.videoUrl}
+                type={review?.reviewType}
+                likes={review?.likesCount}
+                comments={review?.commentCount}
+                onClick={() => setSelectedReview(review)}
+                onLikeUpdate={updateLikeCount}
+              />
+            ))}
+          </AnimatePresence>
+        </motion.div>
+
         {user?.role === "Cohort" && searchedReviews?.length === 0 && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -232,6 +249,8 @@ export default function UserDashboard() {
               <ReviewModal
                 reviewData={selectedReview}
                 onClose={() => setSelectedReview(null)}
+                onLikeUpdate={updateLikeCount}
+                onCommentUpdate={updateCommentCount}
               />
             )}
           </div>

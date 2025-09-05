@@ -12,6 +12,13 @@ export const createComment = async (req, res) => {
     }
 
     const userId = req.user._id;
+    if (!userId) {
+      return es.status(400).json({
+        success: false,
+        error: "Please login first!",
+      });
+    }
+
     const review = await Review.findById(reviewId);
 
     if (!review) {
@@ -23,19 +30,20 @@ export const createComment = async (req, res) => {
     const comment = await Comment.create({
       reviewId,
       content,
-        author: userId,
+      author: userId,
     });
 
     review.commentCount = review.commentCount + 1;
+    let commentCount = review.commentCount
     await review.save();
 
     res.status(201).json({
       success: true,
       message: "Comment created successfully!",
       comment,
+      commentCount,
     });
   } catch (error) {
-    console.error("Post comment Error:", error.message);
     res.status(500).json({ success: false, error: "Internal server error!" });
   }
 };
@@ -79,7 +87,6 @@ export const editComment = async (req, res) => {
       comment,
     });
   } catch (error) {
-    console.error("Edit comment Error:", error.message);
     res.status(500).json({ success: false, error: "Internal server error!" });
   }
 };
@@ -109,9 +116,10 @@ export const deleteComment = async (req, res) => {
     }
 
     if (comment.author.toString() !== req.user._id.toString()) {
-      return res
-        .status(403)
-        .json({ success: false, error: "You are not authorized to delete this comment!" });
+      return res.status(403).json({
+        success: false,
+        error: "You are not authorized to delete this comment!",
+      });
     }
 
     await comment.deleteOne();
@@ -123,9 +131,32 @@ export const deleteComment = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Comment deleted successfully!",
+      commentCount:review.commentCount,
     });
   } catch (error) {
-    console.error("Edit comment Error:", error.message);
+    res.status(500).json({ success: false, error: "Internal server error!" });
+  }
+};
+
+export const getAllComment = async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+
+    if (!reviewId) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Review not found!" });
+    }
+
+    const allComment = await Comment.find({ reviewId })
+      .sort({ createdAt: -1 })
+      .populate("author", "name avatar email");
+
+    res.status(200).json({
+      success: true,
+      allComment,
+    });
+  } catch (error) {
     res.status(500).json({ success: false, error: "Internal server error!" });
   }
 };

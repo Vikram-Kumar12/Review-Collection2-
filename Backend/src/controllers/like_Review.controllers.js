@@ -1,10 +1,16 @@
 import Comment from "../models/comment.models.js";
 import Review from "../models/review.models.js";
 
-export const toggleLike = async (req, res) => {
+export const toggleLike = async (req, res) => {  
   try {
     const { targetId, targetType } = req.body;
     const userId = req.user._id;
+    if(!userId){
+      return res.status(400).json({
+        success:false,
+        error:"Please login first!"
+      })
+    }
 
     if (!targetId || !['review', 'comment'].includes(targetType)) {
       return res.status(400).json({
@@ -42,7 +48,6 @@ export const toggleLike = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Like Error:", error.message);
     res.status(500).json({ success: false, error: "Internal server error." });
   }
 };

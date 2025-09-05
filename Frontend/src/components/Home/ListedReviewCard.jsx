@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { IoMdShare } from "react-icons/io";
+import { toggleLike } from "../../service/postReviewService.js";
+import toast from "react-hot-toast";
 const ListedReviewCard = ({
   user,
   authorImg,
@@ -10,11 +12,13 @@ const ListedReviewCard = ({
   type,
   likes,
   comments,
+  reviewId,
+  onLikeUpdate,
   onClick,
 }) => {
   const cardRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
-
+  const [likesCount, setLikesCount] = useState(likes);
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => setIsVisible(entry.isIntersecting),
@@ -27,8 +31,19 @@ const ListedReviewCard = ({
     };
   }, []);
 
-
-
+  const toggleLikeHandler = async (id) => {
+    try {
+      const response = await toggleLike({
+        targetType: "review",
+        targetId: id,
+      });
+      const updatedLikesCount = response?.data?.likesCount;
+      setLikesCount(updatedLikesCount);
+      onLikeUpdate?.(id, updatedLikesCount);
+    } catch (error) {
+      toast.error(error?.response?.data?.error);
+    }
+  };
   return (
     <div
       onClick={onClick}
@@ -64,25 +79,36 @@ const ListedReviewCard = ({
       )}
 
       <div className=" flex items-center justify-between text-sm  text-gray-300 mt-5 ">
-        <span
-          onClick={(e) => {
-            e.stopPropagation();
-            alert("Like button click!");
-          }}
-        >
-          ❤️ {likes}
-        </span>
-
-        <span>💬 {comments}</span>
-        <span
-          onClick={(e) => {
-            e.stopPropagation();
-            alert("Share button click!");
-          }}
-          className="text-xl"
-        >
-          <IoMdShare />
-        </span>
+        <div className="flex items-center justify-center gap-1">
+          <span
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleLikeHandler(reviewId);
+            }}
+            className="px-2 py-2 text-xl hover:bg-gray-900 hover:scale-105 duration-300 w-fit rounded-full"
+          >
+            ❤️
+          </span>
+          <span className="text-xl">{likes}</span>
+        </div>
+        <div className="flex items-center justify-center gap-1">
+          <span
+            className="px-2 py-2 text-xl hover:bg-gray-900 hover:scale-105 duration-300 w-fit rounded-full"
+          >
+            💬
+          </span>
+          <span className="text-xl">{comments}</span>
+        </div>
+        <div className="flex items-center justify-center gap-1">
+          <span
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            className="px-2 py-2 text-xl hover:bg-gray-900 hover:scale-105 duration-300 w-fit rounded-full"
+          >
+            <IoMdShare />
+          </span>
+        </div>
       </div>
     </div>
   );

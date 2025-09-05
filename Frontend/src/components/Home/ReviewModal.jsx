@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { IoMdShare } from "react-icons/io";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-
-const ReviewModal = ({ reviewData, onClose }) => {
+import { toggleLike } from "../../service/postReviewService.js";
+import toast from "react-hot-toast";
+import CommentReview from "./CommentReview.jsx";
+const ReviewModal = ({ reviewData, onClose, onLikeUpdate, onCommentUpdate }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
+  const [likesCount, setLikesCount] = useState(reviewData?.likesCount || 0);
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -14,17 +16,28 @@ const ReviewModal = ({ reviewData, onClose }) => {
 
   const isTweetWithImages =
     reviewData?.reviewType === "Tweet" && reviewData?.imageUrl?.length > 0;
-
   const goPrev = () => {
     setCurrentImageIndex((prev) =>
       prev === 0 ? reviewData.imageUrl.length - 1 : prev - 1
     );
   };
-
   const goNext = () => {
     setCurrentImageIndex((prev) =>
       prev === reviewData.imageUrl.length - 1 ? 0 : prev + 1
     );
+  };
+  const toggleLikeHandler = async (id) => {
+    try {
+      const response = await toggleLike({
+        targetType: "review",
+        targetId: id,
+      });
+      const updatedLikesCount = response?.data?.likesCount;
+      setLikesCount(updatedLikesCount);
+      onLikeUpdate?.(reviewData._id, updatedLikesCount);
+    } catch (error) {
+      toast.error(error?.response?.data?.error);
+    }
   };
 
   return (
@@ -118,61 +131,31 @@ const ReviewModal = ({ reviewData, onClose }) => {
             </video>
           )}
           <div className="flex items-center justify-between text-sm text-gray-300 mt-5">
-            <span
-              onClick={() => {
-                alert("Like button click!");
-              }}
-              className="cursor-pointer"
-            >
-              ❤️ {reviewData?.likesCount}
-            </span>
-            <span>💬 {reviewData?.commentCount}</span>
-            <span
-              onClick={() => {
-                alert("Share button click!");
-              }}
-              className="text-lg cursor-pointer"
-            >
-              {" "}
-              <IoMdShare />
-            </span>
+            <div className="flex items-center justify-center gap-1">
+              <span
+                onClick={() => toggleLikeHandler(reviewData?._id)}
+                className="px-2 py-2 text-xl hover:bg-gray-900 hover:scale-105 duration-300 w-fit rounded-full"
+              >
+                ❤️
+              </span>
+              <span className="text-xl">{likesCount}</span>
+            </div>
+            <div className="flex items-center justify-center gap-1">
+              <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                className="px-2 py-2 text-xl hover:bg-gray-900 hover:scale-105 duration-300 w-fit rounded-full"
+              >
+                <IoMdShare />
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Post Comment */}
-        <div className="flex items-center space-x-2 border-t border-gray-600 pt-2">
-          <textarea
-            type="text"
-            placeholder="Add a comment..."
-            className="flex-1 bg-gray-900 text-white p-2 rounded-md focus:outline-none"
-          />
-        </div>
-        <button className="w-full text-center mt-4 px-4 py-2 bg-orange-500 text-black rounded-md font-bold">
-          Post
-        </button>
-
-        <h1 className="mt-5 text-sm text-gray-600">All comments...</h1>
         {/* Comment Section */}
-        <div className="space-y-3  overflow-y-auto mb-4 mt-5 scrollbar-hide">
-          {/* Dummy comments */}
-          {/* {[...Array(5)].map((_, i) => (
-            <div key={i} className="bg-gray-800 p-2 rounded-md">
-              <div className="flex items-center space-x-3 mb-2">
-                <img
-                  src="/assets/images/hiteshsir.png"
-                  className="w-10 h-10 rounded-full"
-                />
-                <div>
-                  <h4 className="font-bold">{reviewData?.user}</h4>
-                  <p className="text-xs text-gray-400">{reviewData?.time}</p>
-                </div>
-              </div>
-              <p className="text-sm">{reviewData?.review}</p>
-            </div>
-          ))} */}
-          <h1 className="text-xl flex items-center justify-center mt-5">
-            No comment at
-          </h1>
+        <div className="">
+          <CommentReview reviewId={reviewData._id} onCommentUpdate={onCommentUpdate} />
         </div>
       </div>
     </div>

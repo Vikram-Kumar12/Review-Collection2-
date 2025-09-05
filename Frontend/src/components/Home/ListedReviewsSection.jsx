@@ -22,6 +22,22 @@ const ListedReviewsSection = () => {
     fetchReviews();
   }, []);
 
+  const updateLikeCount = (reviewId, newCount) => {
+    setReviewData((prevData) =>
+      prevData.map((item) =>
+        item._id === reviewId ? { ...item, likesCount: newCount } : item
+      )
+    );
+  };
+
+  const updateCommentCount = (reviewId, newCount) => {
+    setReviewData((prevData) =>
+      prevData.map((item) =>
+        item._id === reviewId ? { ...item, commentCount: newCount } : item
+      )
+    );
+  };
+
   return (
     <section className="bg-black text-white py-10 px-4 min-h-screen">
       <div className="text-center">
@@ -81,6 +97,7 @@ const ListedReviewsSection = () => {
           >
             <ListedReviewCard
               key={index}
+              reviewId={item?._id}
               user={item?.author?.name}
               authorImg={item?.author?.avatar}
               time={item?.createdAt}
@@ -96,6 +113,7 @@ const ListedReviewsSection = () => {
               type={item?.reviewType}
               likes={item?.likesCount}
               comments={item?.commentCount}
+              onLikeUpdate={updateLikeCount}
               onClick={() => setSelectedReview(item)}
             />
           </div>
@@ -108,6 +126,8 @@ const ListedReviewsSection = () => {
           <ReviewModal
             reviewData={selectedReview}
             onClose={() => setSelectedReview(null)}
+            onLikeUpdate={updateLikeCount}
+            onCommentUpdate={updateCommentCount}
           />
         )}
       </div>
