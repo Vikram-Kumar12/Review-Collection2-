@@ -4,7 +4,57 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { toggleLike } from "../../service/postReviewService.js";
 import toast from "react-hot-toast";
 import CommentReview from "./CommentReview.jsx";
-const ReviewModal = ({ reviewData, onClose, onLikeUpdate, onCommentUpdate }) => {
+
+const linkifyText = (text) => {
+  if (!text) return null;
+  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+  const hashtagRegex = /(#\w+)/g;
+
+  const lines = text.split("\n");
+
+  return lines.map((line, lineIndex) => (
+    <div key={lineIndex}>
+      {line.split(/(\s+)/).map((part, index) => {
+        if (urlRegex.test(part)) {
+          let url = part;
+          if (!url.startsWith("http")) {
+            url = `https://${url}`;
+          }
+          return (
+            <a
+              key={index}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline break-words"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {part}
+            </a>
+          );
+        }
+        else if (hashtagRegex.test(part)) {
+          return (
+            <span key={index} className="text-blue-400 font-medium">
+              {part}
+            </span>
+          );
+        }
+        else {
+          return <span key={index}>{part}</span>;
+        }
+      })}
+      {lineIndex < lines.length - 1 && <br />}
+    </div>
+  ));
+};
+
+const ReviewModal = ({
+  reviewData,
+  onClose,
+  onLikeUpdate,
+  onCommentUpdate,
+}) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [likesCount, setLikesCount] = useState(reviewData?.likesCount || 0);
   useEffect(() => {
@@ -37,6 +87,23 @@ const ReviewModal = ({ reviewData, onClose, onLikeUpdate, onCommentUpdate }) => 
       onLikeUpdate?.(reviewData._id, updatedLikesCount);
     } catch (error) {
       toast.error(error?.response?.data?.error);
+    }
+  };
+  const handleShare = async (e) => {
+    e.stopPropagation();
+    const shareUrl = `${window.location.origin}`; // No /review/:id
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Check out this site!",
+          text: reviewData?.review,
+          url: shareUrl,
+        });
+      } catch (err) {}
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+      } catch (err) {}
     }
   };
 
@@ -72,9 +139,9 @@ const ReviewModal = ({ reviewData, onClose, onLikeUpdate, onCommentUpdate }) => 
             </div>
           </div>
 
-          <p className="text-sm leading-snug mb-4 mt-5">
-            {reviewData?.content}
-          </p>
+          <div className="text-white mb-3 whitespace-pre-wrap break-words">
+            {linkifyText(reviewData?.content)}
+          </div>
 
           {isTweetWithImages && (
             <div className="relative w-full h-auto mt-3">
@@ -134,18 +201,17 @@ const ReviewModal = ({ reviewData, onClose, onLikeUpdate, onCommentUpdate }) => 
             <div className="flex items-center justify-center gap-1">
               <span
                 onClick={() => toggleLikeHandler(reviewData?._id)}
-                className="px-2 py-2 text-xl hover:bg-gray-900 hover:scale-105 duration-300 w-fit rounded-full"
+                className="px-2 py-2 text-xl hover:bg-gray-900 hover:scale-105 duration-300 w-fit rounded-full cursor-pointer"
               >
                 ❤️
               </span>
-              <span className="text-xl">{likesCount}</span>
+              <span className="text-xl cursor-pointer">{likesCount}</span>
             </div>
             <div className="flex items-center justify-center gap-1">
               <span
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                className="px-2 py-2 text-xl hover:bg-gray-900 hover:scale-105 duration-300 w-fit rounded-full"
+                onClick={handleShare}
+                className="px-2 py-2 text-xl hover:bg-gray-900 hover:scale-105 duration-300 w-fit rounded-full cursor-pointer"
+                title="Share this review"
               >
                 <IoMdShare />
               </span>
@@ -155,7 +221,10 @@ const ReviewModal = ({ reviewData, onClose, onLikeUpdate, onCommentUpdate }) => 
 
         {/* Comment Section */}
         <div className="">
-          <CommentReview reviewId={reviewData._id} onCommentUpdate={onCommentUpdate} />
+          <CommentReview
+            reviewId={reviewData._id}
+            onCommentUpdate={onCommentUpdate}
+          />
         </div>
       </div>
     </div>

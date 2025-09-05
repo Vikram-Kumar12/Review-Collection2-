@@ -2,6 +2,56 @@ import { useEffect, useRef, useState } from "react";
 import { IoMdShare } from "react-icons/io";
 import { toggleLike } from "../../service/postReviewService.js";
 import toast from "react-hot-toast";
+
+const linkifyText = (text) => {
+  if (!text) return null;
+  // Improved URL regex to better detect URLs
+  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+  const hashtagRegex = /(#\w+)/g;
+
+  // First, split by newlines to preserve line breaks
+  const lines = text.split("\n");
+
+  return lines.map((line, lineIndex) => (
+    <div key={lineIndex}>
+      {line.split(/(\s+)/).map((part, index) => {
+        // Check if part is a URL
+        if (urlRegex.test(part)) {
+          let url = part;
+          if (!url.startsWith("http")) {
+            url = `https://${url}`;
+          }
+          return (
+            <a
+              key={index}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline break-words"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {part}
+            </a>
+          );
+        }
+        // Check if part is a hashtag
+        else if (hashtagRegex.test(part)) {
+          return (
+            <span key={index} className="text-blue-400 font-medium">
+              {part}
+            </span>
+          );
+        }
+        // Regular text
+        else {
+          return <span key={index}>{part}</span>;
+        }
+      })}
+      {lineIndex < lines.length - 1 && <br />}
+    </div>
+  ));
+};
+
 const ListedReviewCard = ({
   user,
   authorImg,
@@ -44,12 +94,35 @@ const ListedReviewCard = ({
       toast.error(error?.response?.data?.error);
     }
   };
+
+  const handleShare = async (e) => {
+    e.stopPropagation();
+    const shareUrl = `${window.location.origin}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Check out this site!",
+          text: review,
+          url: shareUrl,
+        });
+      } catch (err) {}
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success("Link copied to clipboard!");
+      } catch (err) {
+        toast.error("Failed to copy link");
+      }
+    }
+  };
+
   return (
     <div
+      ref={cardRef}
       onClick={onClick}
       className="flex-shrink-0 cursor-pointer w-full  max-w-sm p-4 rounded-md "
     >
-      {/* Terminal header */}
       <div className="flex  items-center space-x-2 mb-3 ">
         <span className="w-3 h-3 bg-red-500 rounded-full"></span>
         <span className="w-3 h-3 bg-yellow-400 rounded-full"></span>
@@ -63,7 +136,9 @@ const ListedReviewCard = ({
           <p className="text-xs text-gray-400">{time?.slice(0, 10)}</p>
         </div>
       </div>
-      <p className="text-sm leading-snug mb-4 mt-5">{review}</p>
+      <div className="text-white mb-3 whitespace-pre-wrap break-words">
+        {linkifyText(review)}
+      </div>
       {type === "Tweet" && image && (
         <img
           src={image}
@@ -92,18 +167,14 @@ const ListedReviewCard = ({
           <span className="text-xl">{likes}</span>
         </div>
         <div className="flex items-center justify-center gap-1">
-          <span
-            className="px-2 py-2 text-xl hover:bg-gray-900 hover:scale-105 duration-300 w-fit rounded-full"
-          >
+          <span className="px-2 py-2 text-xl hover:bg-gray-900 hover:scale-105 duration-300 w-fit rounded-full">
             💬
           </span>
           <span className="text-xl">{comments}</span>
         </div>
         <div className="flex items-center justify-center gap-1">
           <span
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
+            onClick={handleShare}
             className="px-2 py-2 text-xl hover:bg-gray-900 hover:scale-105 duration-300 w-fit rounded-full"
           >
             <IoMdShare />

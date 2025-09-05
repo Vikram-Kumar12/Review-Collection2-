@@ -11,6 +11,56 @@ import {
 } from "../../service/postReviewService.js";
 import toast from "react-hot-toast";
 import useAuth from "../../hooks/useAuth.js";
+
+const linkifyText = (text) => {
+  if (!text) return null;
+  // Improved URL regex to better detect URLs
+  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+  const hashtagRegex = /(#\w+)/g;
+
+  // First, split by newlines to preserve line breaks
+  const lines = text.split("\n");
+
+  return lines.map((line, lineIndex) => (
+    <div key={lineIndex}>
+      {line.split(/(\s+)/).map((part, index) => {
+        // Check if part is a URL
+        if (urlRegex.test(part)) {
+          let url = part;
+          if (!url.startsWith("http")) {
+            url = `https://${url}`;
+          }
+          return (
+            <a
+              key={index}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline break-words"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {part}
+            </a>
+          );
+        }
+        // Check if part is a hashtag
+        else if (hashtagRegex.test(part)) {
+          return (
+            <span key={index} className="text-blue-400 font-medium">
+              {part}
+            </span>
+          );
+        }
+        // Regular text
+        else {
+          return <span key={index}>{part}</span>;
+        }
+      })}
+      {lineIndex < lines.length - 1 && <br />}
+    </div>
+  ));
+};
+
 const CommentReview = ({ reviewId, onCommentUpdate }) => {
   const [postComment, setPostComment] = useState({
     reviewId: reviewId,
@@ -75,9 +125,7 @@ const CommentReview = ({ reviewId, onCommentUpdate }) => {
       onCommentUpdate(reviewId, resp?.data?.commentCount);
       toast.success(resp?.data?.message || "Comment deleted successfully!");
     } catch (error) {
-      toast.error(
-        error?.resp?.data?.error || "Comment delete request failed!"
-      );
+      toast.error(error?.resp?.data?.error || "Comment delete request failed!");
     }
   };
 
@@ -167,7 +215,9 @@ const CommentReview = ({ reviewId, onCommentUpdate }) => {
                     )}
                   </div>
                 </div>
-                <p className="px-10 mt-3">{comment.content}</p>
+                <div className="text-white mb-3 whitespace-pre-wrap break-words">
+                  {linkifyText(comment.content)}
+                </div>
               </div>
             ))}
           </>

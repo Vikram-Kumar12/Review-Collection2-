@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
+
 const ListedReviewsSection = () => {
   const [selectedReview, setSelectedReview] = useState(null);
   const [reviewData, setReviewData] = useState(null);
@@ -39,7 +40,7 @@ const ListedReviewsSection = () => {
   };
 
   return (
-    <section className="bg-black text-white py-10 px-4 min-h-screen">
+    <section className="bg-black text-white py-10 px-4 mb-10">
       <div className="text-center">
         <div className="relative inline-block mb-2">
           <h2 className="text-3xl md:text-4xl font-bold  text-white mb-10 relative z-10">
@@ -50,7 +51,7 @@ const ListedReviewsSection = () => {
       </div>
 
       {reviewData?.length === 0 && (
-        <div className="w-full h-full">
+        <div className="w-full ">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -93,7 +94,7 @@ const ListedReviewsSection = () => {
         {reviewData?.map((item, index) => (
           <div
             key={index}
-            className="h-full flex items-center justify-center border border-orange-500 lg:border-gray-800 hover:border-orange-500 bg-black text-white transition-all duration-700 rounded-md "
+            className="h-full flex items-center justify-center border border-orange-500 lg:border-gray-800 bg-black hover:border-orange-500  text-white transition-all duration-700 rounded-md "
           >
             <ListedReviewCard
               key={index}
@@ -103,8 +104,8 @@ const ListedReviewsSection = () => {
               time={item?.createdAt}
               review={
                 item?.reviewType === "Text"
-                  ? item?.content?.slice(0, 600) +
-                    (item.content.length > 600 ? "..." : "")
+                  ? item?.content?.slice(0, 300) +
+                    (item.content.length > 300 ? "..." : "")
                   : item?.content?.slice(0, 50) +
                     (item.content.length > 50 ? "..." : "")
               }

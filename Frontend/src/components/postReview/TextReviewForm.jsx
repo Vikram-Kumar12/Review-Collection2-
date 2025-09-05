@@ -64,7 +64,7 @@ export default function TextReviewForm() {
 
   return (
     <div className="space-y-6 animate-fadeIn">
-      <div className="relative">
+      <div className="relative ">
         <textarea
           className="w-full p-4 border-2  border-gray-600 rounded-xl outline-none  transition-all duration-300 resize-none shadow-sm"
           placeholder="Share your experience in detail..."

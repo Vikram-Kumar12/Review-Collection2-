@@ -1,8 +1,6 @@
 import Role from "../models/role.models.js";
 
 const cohortEmails = [
-  "student1@example.com",
-  "student2@example.com",
   "vikram8987k@gmail.com",
   // rest student email....
 ];

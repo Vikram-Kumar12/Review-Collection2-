@@ -7,6 +7,48 @@ import {
 } from "../../service/postReviewService.js";
 import ReviewModal from "../Home/ReviewModal.jsx";
 
+const linkifyText = (text) => {
+  if (!text) return null;
+  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+  const hashtagRegex = /(#\w+)/g;
+
+  const lines = text.split("\n");
+
+  return lines.map((line, lineIndex) => (
+    <div key={lineIndex}>
+      {line.split(/(\s+)/).map((part, index) => {
+        if (urlRegex.test(part)) {
+          let url = part;
+          if (!url.startsWith("http")) {
+            url = `https://${url}`;
+          }
+          return (
+            <a
+              key={index}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline break-words"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {part}
+            </a>
+          );
+        } else if (hashtagRegex.test(part)) {
+          return (
+            <span key={index} className="text-blue-400 font-medium">
+              {part}
+            </span>
+          );
+        } else {
+          return <span key={index}>{part}</span>;
+        }
+      })}
+      {lineIndex < lines.length - 1 && <br />}
+    </div>
+  ));
+};
+
 export default function AdminDashboard() {
   const [getAllReviewData, setGetAllReviewData] = useState(null);
   const [filter, setFilter] = useState("all");
@@ -330,12 +372,13 @@ export default function AdminDashboard() {
                       {review?.reviewType}
                     </span>
                   </div>
-
-                  <div className="text-sm text-gray-200 mb-3">
-                    {review?.content?.slice(0, 400) +
-                      (review.content.length > 400 ? "..." : "")}
+                  {/* Review text with formatting */}
+                  <div className="text-white mb-3 whitespace-pre-wrap break-words">
+                    {linkifyText(
+                      review?.content?.slice(0, 400) +
+                        (review.content.length > 400 ? "..." : "")
+                    )}
                   </div>
-
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-gray-400">
                       {review?.createdAt?.slice(0, 10)}
@@ -425,10 +468,12 @@ export default function AdminDashboard() {
                         <td className="px-6 py-4">
                           <div
                             onClick={() => setSelectedReview(review)}
-                            className="text-sm text-white "
+                            className="text-white mb-3 whitespace-pre-wrap break-words"
                           >
-                            {review?.content?.slice(0, 350) +
-                              (review.content.length > 350 ? "..." : "")}
+                            {linkifyText(
+                              review?.content?.slice(0, 200) +
+                                (review.content.length > 200 ? "..." : "")
+                            )}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
