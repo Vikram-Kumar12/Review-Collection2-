@@ -1,7 +1,8 @@
 import axiosInstance from "../api/axios.js";
 
 export const loginUser = async () => {
-  window.open("http://localhost:5000/api/v1/auth/login-with-google", "_self");
+  const VITE_API_URL = await import.meta.env.VITE_API_URL || "http:localhost:8000/api/v1";
+  window.open(`${VITE_API_URL}/auth/login-with-google`, "_self");
 };
 
 export const logoutUser = async () => {
