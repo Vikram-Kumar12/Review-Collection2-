@@ -6,7 +6,7 @@ import Footer from "../components/Home/Footer";
 
 const Home = () => {
   return (
-    <div className="w-full max-w-7xl mx-auto flex flex-col ">
+    <div className="w-full max-w-7xl mx-auto flex flex-col">
       <HeroSection />
       <ReviewCollectionBenefits/>
       <ListedReviewsSection/>
