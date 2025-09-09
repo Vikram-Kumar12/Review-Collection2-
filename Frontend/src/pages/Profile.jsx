@@ -25,7 +25,7 @@ const Profile = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="lg:min-h-screen p-6 flex flex-col items-center pt-35 lg:pt-20 mt-0 lg:mt-20"
+      className="lg:min-h-screen p-6 flex flex-col items-center pt-35 lg:pt-20 mt-0 lg:mt-20 "
     >
       <div className="max-w-4xl w-full border-2 border-gray-700 rounded-lg shadow-lg p-6 space-y-6">
         {/* Desktop-view */}
@@ -57,16 +57,8 @@ const Profile = () => {
         </div>
         {/* Mobile-view */}
         <div className="block lg:hidden">
-          <div className="flex items-center justify-end">
-            <button
-              onClick={() => setEditMode(!editMode)}
-              className="border border-gray-500 hover:bg-gray-700 cursor-pointer transition px-4 py-2 rounded"
-            >
-              {editMode ? "Cancel" : "Edit"}
-            </button>
-          </div>
-          <div className="flex space-x-4">
-            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center text-xl font-bold text-black">
+          <div className="flex items-center justify-between">
+            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center text-xl font-bold text-black ">
               {user?.avatar && (
                 <img
                   src={user?.avatar}
@@ -75,14 +67,22 @@ const Profile = () => {
                 />
               )}
             </div>
-            <div className="flex-1">
+            <button
+              onClick={() => setEditMode(!editMode)}
+              className="border border-gray-500 hover:bg-gray-700 cursor-pointer transition px-4 py-2 rounded"
+            >
+              {editMode ? "Cancel" : "Edit"}
+            </button>
+          </div>
+          <div className="flex flex-col space-x-4 gap-2">
+            <div className="flex-1 mt-3 break-words">
               <h2 className="text-2xl font-semibold bg-gradient-to-r bg-clip-text text-transparent from-orange-500 via-orange-600 to-orange-700">
                 {user?.name}
               </h2>
-              <p className="text-gray-400">
+              <p className="text-gray-400 break-words">
                 @{user?.email?.split("@")[0]}
               </p>
-              <p className="text-gray-400">{user?.email}</p>
+              <p className="text-gray-400 break-words">{user?.email}</p>
             </div>
           </div>
         </div>
@@ -117,14 +117,12 @@ const Profile = () => {
                   className="w-full mt-1 p-2 bg-[#1e1e1e] text-white border border-gray-600 rounded"
                 />
               ) : (
-                <p className="text-white">
-                  @{user?.email?.split("@")[0]}
-                </p>
+                <p className="text-white">@{user?.email?.split("@")[0]}</p>
               )}
             </div>
             <div>
               <label className="text-sm text-gray-400">Email</label>
-              <p className="w-full mt-1 p-2 bg-[#1e1e1e] text-white border border-gray-600 rounded">
+              <p className="w-full mt-1 p-2 bg-[#1e1e1e] text-white border border-gray-600 rounded break-words">
                 {user?.email}
                 <span className="ml-2 text-sm">🔒</span>
               </p>

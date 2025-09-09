@@ -18,8 +18,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user, isAuth } = useAuth();
-  
-  
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -179,8 +178,7 @@ const Navbar = () => {
               </div>
 
               <div className="p-2 flex flex-col justify-between h-[650px]">
-                {user?.role === "Cohort" ||
-                user?.role === "Admin" ? (
+                {user?.role === "Cohort" || user?.role === "Admin" ? (
                   <nav className="flex flex-col space-y-2 mt-5">
                     {menuItems.map((item) => (
                       <Link
@@ -226,6 +224,9 @@ const Navbar = () => {
                 ) : (
                   <Link
                     to="/login"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                    }}
                     className="w-full text-xl bg-[#F97316] py-3 px-4 rounded-md text-white hover:bg-[#EA580C] text-center cursor-pointer inline-block"
                   >
                     Login
@@ -281,8 +282,7 @@ const Navbar = () => {
               </div>
 
               <div className="p-2 flex flex-col justify-between h-full">
-                {user?.role === "Cohort" ||
-                user?.role === "Admin" ? (
+                {user?.role === "Cohort" || user?.role === "Admin" ? (
                   <nav className="flex flex-col space-y-2 mt-5">
                     {menuItems.map((item) => (
                       <Link

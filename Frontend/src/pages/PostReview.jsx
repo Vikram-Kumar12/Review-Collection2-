@@ -21,7 +21,7 @@ export default function PostReview() {
   };
 
   return (
-    <div className="lg:min-h-screen  pt-35 lg:pt-20 mt-0 lg:mt-20">
+    <div className="lg:min-h-screen  pt-35 lg:pt-20 mt-0 lg:mt-20 ">
       <div className="max-w-2xl mx-auto border border-gray-700 rounded-xl shadow-2xl overflow-hidden transition-all duration-500 transform hover:shadow-xl">
         <div className="p-6 md:p-8 space-y-6">
           <div className="text-center">

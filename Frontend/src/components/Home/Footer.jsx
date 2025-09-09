@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { CiYoutube } from "react-icons/ci";
 import { BiLogoInstagram } from "react-icons/bi";
@@ -6,19 +6,51 @@ import { FiGithub } from "react-icons/fi";
 import { FaXTwitter } from "react-icons/fa6";
 import { SlSocialLinkedin } from "react-icons/sl";
 import { FaRegMessage } from "react-icons/fa6";
+
 const Footer = () => {
+  const [key, setKey] = useState(0);
+
+  // Reset animation every 5 seconds to create infinite loop
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setKey((prevKey) => prevKey + 1);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Animation variants for each character
+  const characterVariants = {
+    hidden: {
+      y: -100,
+      opacity: 0,
+      rotate: -10,
+    },
+    visible: (i) => ({
+      y: 0,
+      opacity: 1,
+      rotate: 0,
+      transition: {
+        delay: i * 0.1,
+        type: "spring",
+        damping: 12,
+        stiffness: 200,
+      },
+    }),
+  };
+
   return (
     <motion.footer
-      className="select-none  pt-8  overflow-hidden border-t border-orange-900 bg-[#000000]"
+      className="select-none pt-8 overflow-hidden border-t border-orange-900 bg-[#000000]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
       <div className="container mx-auto px-10 mb-10">
-        <div className="flex flex-col md:flex-row  items-start  lg:gap-80 gap-10">
+        <div className="flex flex-col md:flex-row items-start lg:gap-80 gap-10">
           <div className="flex flex-col lg:items-center">
             <motion.div
-              className="flex items-center "
+              className="flex items-center"
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -148,8 +180,10 @@ const Footer = () => {
             </motion.div>
           </div>
         </div>
+
+        {/* ReviewCollection Animation */}
         <motion.div
-          className="w-full mt-12 flex justify-center items-center  relative"
+          className="w-full mt-12 flex justify-center items-center relative"
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.9 }}
@@ -157,7 +191,7 @@ const Footer = () => {
           <div className="relative w-fit">
             <div className="absolute inset-0 w-full h-full blur-2xl opacity-10 bg-gradient-to-r from-[#FF7D0C] via-[#EA580C] to-[#FE9332] z-0 "></div>
             <h1
-              className="relative text-5xl md:text-[5rem] lg:text-[8rem] font-black text-[#EA580C] tracking-tight z-10"
+              className="relative text-5xl md:text-[5rem] lg:text-[9rem] font-black text-[#EA580C] tracking-tight z-10 flex"
               style={{
                 WebkitMaskImage:
                   "linear-gradient(to bottom, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 90%)",
@@ -165,7 +199,18 @@ const Footer = () => {
                 WebkitMaskSize: "100% 100%",
               }}
             >
-              ReviewCollection
+              {"ReviewCollection".split("").map((char, index) => (
+                <motion.span
+                  key={`review-${key}-${index}`}
+                  custom={index}
+                  variants={characterVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="inline-block"
+                >
+                  {char}
+                </motion.span>
+              ))}
             </h1>
           </div>
         </motion.div>

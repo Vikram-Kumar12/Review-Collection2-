@@ -122,7 +122,7 @@ export default function TextReviewForm() {
           }`}
         >
           {isSubmitting ? (
-            <div className="flex items-center">
+            <div className="flex flex-col  items-center">
               <svg
                 className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                 xmlns="http://www.w3.org/2000/svg"

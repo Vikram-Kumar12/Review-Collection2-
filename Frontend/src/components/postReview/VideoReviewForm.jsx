@@ -231,10 +231,6 @@ export default function VideoReviewForm() {
               value={videoData.content}
               onChange={
                 handleChange
-                //   (e) => {
-                //   setDescription(e.target.value);
-                //   setError("");
-                // }
               }
               onKeyPress={handleKeyPress}
               rows="4"
